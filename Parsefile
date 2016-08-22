@@ -1,0 +1,15 @@
+###
+# Parsefile for CSV Parser
+###
+
+name: Census CSV Parser
+description: >
+  Parses CSV CBP prs dataset from 2002
+maintainers:
+  - Niger Little-Poole
+version: "1.0.0"
+license: public
+source_urls:
+ - https://www2.census.gov/econ2002/CBP_CSV/
+extract:
+  - census.yaml

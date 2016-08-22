@@ -1,0 +1,2 @@
+parsekit==1.1.1
+parsekit-tools==1.1.0

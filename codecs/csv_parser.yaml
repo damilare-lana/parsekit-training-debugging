@@ -1,0 +1,82 @@
+##
+# CSV Parser Example
+##
+
+name: CSV Parser
+description: >
+  Transform and Standardize the Tables
+dependencies:
+  'parsekit_tools.schema': 'schema'
+  'parsekit_tools.formats.CSV': 'CSV'
+  'parsekit_tools.transform.filter': 'filter'
+  'parsekit_tools.transform.strings': 'strings'
+  'parsekit_tools.load': 'load'
+
+transform:
+  - step: Set Schema
+    action: schema.SetSchema
+    fields:
+      - name: fipstate
+        type: string
+      - name: sic
+        type: string    
+      - name: empflag
+        type: string
+      - name: emp
+        type: string
+      - name: ap
+        type: string
+      - name: est
+        type: decimal
+      - name: n1_4
+        type: string
+      - name: n5_9
+        type: string
+      - name: n10_19
+        type: string
+      - name: n20_49
+        type: string
+      - name: n50_99
+        type: string
+      - name: n100_249
+        type: string
+      - name: n250_499
+        type: string
+      - name: n500_999
+        type: string
+      - name: n500_1000
+        type: string
+
+  - step: Set table name by "year" key of metadata.
+    action: load.SetTableNameByMetadata
+    format: "table_{year}"
+    matchers:
+      year:
+        key: name
+        pattern: '\d{4}'
+
+  - step: Extract all rows from Windows encoded CSV.
+    action: CSV.ReadRecords
+    content_encoding: cp500
+
+  - step: Filter unwanted records
+    action: filter.FilterRecords
+    filter_list:
+      - match:
+        - field_name: sic
+          patterns: 
+            - '^.*$'
+
+  - step: Strip
+    action: strings.Strip
+    remove: "-"
+
+  - step: Get Rid of Nulls
+    action: strings.DisambiguateNulls
+    nulls:
+      - ""
+
+load:
+  - step: Output to CSV in Working Directory
+    action: load.OutputCSV
+    table_key: table_name

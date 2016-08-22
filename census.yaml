@@ -1,0 +1,41 @@
+###
+# us.gov.census.csv.parser
+###
+
+###
+# Load dependencies
+###
+dependencies:
+  'parsekit_tools.emit': 'emit'
+  'parsekit_tools.extract.http': 'http'
+  'parsekit_tools.extract.compression': 'compression'
+  'parsekit_tools.formats.html': 'html'
+
+###
+# Parse
+###
+extract:
+  - step: Yield the path to the 2002 data list
+    action: emit.EmitPaths
+    paths:
+      - "http://www2.census.gov/econ2002/CBP_CSV/"
+
+  - step: Fetch the the page for 2002
+    action: http.DownloadFiles
+
+  - step: Extract Data File download links from the page
+    action: html.ExtractLink
+    html_parser: lxml
+    criteria:
+      href: '^.*.txt$'
+
+  - step: Fetch Files File
+    action: http.DownloadFiles
+
+  - step: Uncompress File
+    action: compression.UncompressFile
+
+  - step: Apply the Codec on the Data Records
+    action: parsekit.ApplyCodec
+    codec: csv_parser
+
